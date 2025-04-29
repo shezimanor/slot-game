@@ -14,7 +14,7 @@ export class ReelManager extends Component {
 
   // 每條reel間的遞延時間（秒）
   @property(CCFloat)
-  public reelStartDelay: number = 0.2;
+  public reelStartDelay: number = 0.1;
 
   @property([Reel])
   public reelInstances: Reel[] = [];

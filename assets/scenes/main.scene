@@ -472,9 +472,8 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "slotCount": 8,
-    "positionCenterIndex": 6,
     "slotHeight": 135,
+    "tweenDuration": 0.2,
     "_id": "484jZ5hclKjaS7+58wNaf6"
   },
   {
@@ -557,9 +556,8 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "slotCount": 8,
-    "positionCenterIndex": 6,
     "slotHeight": 135,
+    "tweenDuration": 0.2,
     "_id": "1dJ1ovZrFLkbO1jR0V4Fjh"
   },
   {
@@ -642,9 +640,8 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "slotCount": 8,
-    "positionCenterIndex": 6,
     "slotHeight": 135,
+    "tweenDuration": 0.2,
     "_id": "42basz1jRIG4IHbKwJPwFP"
   },
   {
@@ -727,9 +724,8 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "slotCount": 8,
-    "positionCenterIndex": 6,
     "slotHeight": 135,
+    "tweenDuration": 0.2,
     "_id": "5doTTUJpFGZ58NnEYicVjp"
   },
   {
@@ -812,9 +808,8 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "slotCount": 8,
-    "positionCenterIndex": 6,
     "slotHeight": 135,
+    "tweenDuration": 0.2,
     "_id": "b9eT+0w3lEVYdSLuLsgDG9"
   },
   {

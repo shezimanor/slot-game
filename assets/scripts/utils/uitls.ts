@@ -15,3 +15,17 @@ export function getRandomSlotType(): SlotType {
 export function getRandomSlotTypeFruit(): SlotType {
   return SlotTypeFruitPool[Math.floor(Math.random() * SlotTypePool.length)];
 }
+
+// 測試用
+export function getRandomResult(): SlotType[] {
+  const result: SlotType[][] = [
+    [SlotType.Banana, SlotType.Banana, SlotType.Banana],
+    [SlotType.Grape, SlotType.Grape, SlotType.Grape],
+    [SlotType.Wild, SlotType.Wild, SlotType.Banana],
+    [SlotType.Watermelon, SlotType.Watermelon, SlotType.Watermelon],
+    [SlotType.Scatter, SlotType.Scatter, SlotType.Scatter],
+    [SlotType.Orange, SlotType.Orange, SlotType.Orange]
+  ];
+  const target = Math.floor(Math.random() * result.length);
+  return result[target];
+}
