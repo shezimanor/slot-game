@@ -42,6 +42,7 @@ export class Reel extends Component {
   private _isStopping: boolean = false;
   private _startPosition: Vec3 = new Vec3(0, 0, 0);
   private _tweenPosition: Vec3 = new Vec3(0, 0, 0);
+  private _updatedResultCount: number = 0;
 
   protected start(): void {
     // -3 是因為中心格下方有兩格且因為是索引要再減一
@@ -77,11 +78,15 @@ export class Reel extends Component {
           // 因為這個邏輯為固定的，所以可用較為制式的寫法
           if (this.targetResult.length > 0) {
             // index 3, 4, 5 才處理
+            // TODO: 現在這個寫法有一個問題，觸發順序會影響填入的順序的正確與否。
+            // 一旦 _spinSpeed 改變，這個邏輯可能就會失效。
+            // 所以必須要確保 index 是對應的
             if (Math.abs(i - this._positionCenterIndex) <= 1) {
-              // 取出 this.targetResult 的第一個元素
               const targetType = this.targetResult.shift();
-              if (targetType !== undefined)
+              if (targetType !== undefined) {
                 this.slotInstances[i].slotType = targetType;
+                console.log(this.node.name, i, targetType);
+              }
             }
           }
           // 結果陣列沒有項目了，表示塞完了，可以準備對齊動畫並停下來
@@ -119,6 +124,7 @@ export class Reel extends Component {
   startSpin() {
     // 設定本次目標結果
     this.targetResult = getRandomResult();
+    this._updatedResultCount = 0;
     // this._isSpinning = true;
     tween(this.node)
       .to(this.tweenSpinDuration, { position: this._tweenPosition }) // 往上跳
@@ -151,6 +157,7 @@ export class Reel extends Component {
   startAlign() {
     this._isStopping = false;
     this._isSpinning = false;
+    this._updatedResultCount = 0;
     // index = 0 的 Slot 不要使用 tween
     for (let i = this.slotCount - 1; i > 0; i--) {
       const slot = this.slots[i];

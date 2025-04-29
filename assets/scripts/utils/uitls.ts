@@ -21,7 +21,7 @@ export function getRandomResult(): SlotType[] {
   const result: SlotType[][] = [
     [SlotType.Banana, SlotType.Banana, SlotType.Banana],
     [SlotType.Grape, SlotType.Grape, SlotType.Grape],
-    [SlotType.Wild, SlotType.Wild, SlotType.Banana],
+    [SlotType.Wild, SlotType.Wild, SlotType.Wild],
     [SlotType.Watermelon, SlotType.Watermelon, SlotType.Watermelon],
     [SlotType.Scatter, SlotType.Scatter, SlotType.Scatter],
     [SlotType.Orange, SlotType.Orange, SlotType.Orange]
