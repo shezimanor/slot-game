@@ -1,7 +1,7 @@
 import { _decorator, CCInteger, Component, Prefab } from 'cc';
 import { SlotPool } from './SlotPool';
 import { SlotType } from './types';
-import { getRandomSlotTypeFruit } from './utils/uitls';
+import { getRandomSlotType } from './utils/uitls';
 import { Slot } from './Slot';
 const { ccclass, property } = _decorator;
 
@@ -34,7 +34,7 @@ export class Reel extends Component {
     for (let i = 0; i < this.slotCount; i++) {
       const slot = SlotPool.instance.getSlot();
       const slotInstance = slot.getComponent(Slot);
-      slotInstance.slotType = getRandomSlotTypeFruit();
+      slotInstance.slotType = getRandomSlotType();
       slot.setPosition(0, (i - this.positionCenterIndex) * this.slotHeight, 0);
       slot.setParent(this.node);
     }
