@@ -2,6 +2,7 @@ import { _decorator, Component, Node, Prefab } from 'cc';
 import { SlotPool } from './SlotPool';
 import { EventManager } from './EventManager';
 import { ResourceManager } from './ResourceManager';
+import { Reel } from './Reel';
 const { ccclass, property } = _decorator;
 
 @ccclass('ReelManager')
@@ -36,8 +37,16 @@ export class ReelManager extends Component {
 
   initReels() {
     console.log('init reels');
+    // 初始化 SlotPool
     SlotPool.instance.init(
       ResourceManager.getAsset<Prefab>('prefabs', 'SlotPrefab')
     );
+    // 初始化每個 Reel
+    for (const reelNode of this.reelNodes) {
+      const reel = reelNode.getComponent(Reel);
+      if (reel) {
+        reel.init();
+      }
+    }
   }
 }

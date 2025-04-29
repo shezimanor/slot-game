@@ -463,6 +463,12 @@
     "__prefab": {
       "__id__": 21
     },
+    "slotBody": {
+      "__id__": 5
+    },
+    "slotNeonFrame": {
+      "__id__": 10
+    },
     "_id": ""
   },
   {

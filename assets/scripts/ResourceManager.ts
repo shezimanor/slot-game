@@ -43,6 +43,7 @@ export class ResourceManager {
       }
       assets.forEach((asset) => {
         const name = asset.name;
+        console.log('name', name);
         this.assetStores[path][name] = asset;
       });
       console.log(`${path} 載入成功`);

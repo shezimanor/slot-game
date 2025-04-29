@@ -58,7 +58,4 @@ export class SlotPool {
     Slot.active = false;
     this.inactivePool.add(Slot);
   }
-
-  // 設定屬性
-  setAttrs(slot: Node) {}
 }
