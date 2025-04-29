@@ -631,7 +631,9 @@
     "slotNeonFrame": {
       "__id__": 10
     },
-    "testLabel": null,
+    "testLabel": {
+      "__id__": 21
+    },
     "_id": ""
   },
   {
