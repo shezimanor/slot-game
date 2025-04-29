@@ -27,5 +27,6 @@ export class GameManager extends Component {
     this.scheduleOnce(() => {
       this.spinButton.interactable = true;
     }, 1);
+    EventManager.eventTarget.emit('start-spin');
   }
 }
