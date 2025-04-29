@@ -11,10 +11,16 @@ export class GameManager extends Component {
   protected onLoad(): void {
     ResourceManager.init();
     EventManager.eventTarget.on('resource-loaded', this.onSourcesLoaded, this);
+    EventManager.eventTarget.on('activate-spin', this.activateSpinButton, this);
   }
 
   protected onDestroy(): void {
     EventManager.eventTarget.off('resource-loaded', this.onSourcesLoaded, this);
+    EventManager.eventTarget.off(
+      'activate-spin',
+      this.activateSpinButton,
+      this
+    );
   }
 
   onSourcesLoaded() {
@@ -28,5 +34,9 @@ export class GameManager extends Component {
       this.spinButton.interactable = true;
     }, 1);
     EventManager.eventTarget.emit('start-spin');
+  }
+
+  activateSpinButton() {
+    this.spinButton.interactable = true;
   }
 }

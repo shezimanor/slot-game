@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Sprite, SpriteAtlas } from 'cc';
+import { _decorator, Component, Label, Node, Sprite, SpriteAtlas } from 'cc';
 import { SlotSpriteFrameType, SlotType } from './types/index.d';
 import { ResourceManager } from './ResourceManager';
 const { ccclass, property } = _decorator;
@@ -9,6 +9,8 @@ export class Slot extends Component {
   public slotBody: Sprite = null;
   @property(Node)
   public slotNeonFrame: Node = null;
+  @property(Label)
+  public testLabel: Label = null;
 
   private _slotType: SlotType = SlotType.Cherry;
   private _slotSpriteAtlas: SpriteAtlas = null;

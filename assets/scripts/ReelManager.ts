@@ -19,6 +19,11 @@ export class ReelManager extends Component {
   @property([Reel])
   public reelInstances: Reel[] = [];
 
+  // 整個 ReelManager 的輪轉狀態標記
+  private _isSpinning: boolean = false;
+  // 用來紀錄已經停止的Reel數量
+  private _stoppedReels: number = 0;
+
   protected onLoad(): void {
     if (!ReelManager._instance) {
       ReelManager._instance = this;
@@ -27,6 +32,7 @@ export class ReelManager extends Component {
     }
     EventManager.eventTarget.on('reels-init', this.initReels, this);
     EventManager.eventTarget.on('start-spin', this.startSpin, this);
+    EventManager.eventTarget.on('reel-stopped', this.onReelStopped, this);
   }
 
   protected onDestroy(): void {
@@ -35,6 +41,7 @@ export class ReelManager extends Component {
     }
     EventManager.eventTarget.off('reels-init', this.initReels, this);
     EventManager.eventTarget.off('start-spin', this.startSpin, this);
+    EventManager.eventTarget.off('reel-stopped', this.onReelStopped, this);
   }
 
   initReels() {
@@ -50,11 +57,28 @@ export class ReelManager extends Component {
   }
 
   startSpin() {
+    if (this._isSpinning) return;
+    this._isSpinning = true;
+    this._stoppedReels = 0;
     for (let i = 0; i < this.reelInstances.length; i++) {
       // 用延遲的方式讓每個Reel啟動
       this.scheduleOnce(() => {
         this.reelInstances[i].startSpin();
       }, i * this.reelStartDelay);
     }
+  }
+
+  onReelStopped() {
+    this._stoppedReels++;
+    if (this._stoppedReels >= this.reelInstances.length) {
+      this._stoppedReels = 0;
+      this.stopSpin();
+    }
+  }
+
+  stopSpin() {
+    this._isSpinning = false;
+    // 觸發事件，表示所有的 Reel 都已經停止了，可以重新啟動 Spin 按鈕
+    EventManager.eventTarget.emit('activate-spin');
   }
 }
