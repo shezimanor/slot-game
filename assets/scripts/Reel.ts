@@ -42,7 +42,7 @@ export class Reel extends Component {
   private _isStopping: boolean = false;
   private _startPosition: Vec3 = new Vec3(0, 0, 0);
   private _tweenPosition: Vec3 = new Vec3(0, 0, 0);
-  private _updatedResultCount: number = 0;
+  private _tempUpdatedSet: Set<SlotType> = new Set();
 
   protected start(): void {
     // -3 是因為中心格下方有兩格且因為是索引要再減一
@@ -76,20 +76,23 @@ export class Reel extends Component {
         if (this._isStopping) {
           // 填入結果：將結果回填給索引為 3, 4(this._positionCenterIndex), 5 的 Slot 上
           // 因為這個邏輯為固定的，所以可用較為制式的寫法
-          if (this.targetResult.length > 0) {
+          if (this._tempUpdatedSet.size < 3) {
             // index 3, 4, 5 才處理
-            // TODO: 現在這個寫法有一個問題，觸發順序會影響填入的順序的正確與否。
-            // 一旦 _spinSpeed 改變，這個邏輯可能就會失效。
-            // 所以必須要確保 index 是對應的
-            if (Math.abs(i - this._positionCenterIndex) <= 1) {
-              const targetType = this.targetResult.shift();
+            // 使用 set 來辨識是否已經更新過了，較為高效
+            if (
+              Math.abs(i - this._positionCenterIndex) <= 1 &&
+              !this._tempUpdatedSet.has(i)
+            ) {
+              const targetType =
+                this.targetResult[i - this._positionCenterIndex + 1];
               if (targetType !== undefined) {
                 this.slotInstances[i].slotType = targetType;
                 console.log(this.node.name, i, targetType);
+                this._tempUpdatedSet.add(i);
               }
             }
           }
-          // 結果陣列沒有項目了，表示塞完了，可以準備對齊動畫並停下來
+          // set已經有 3 個項目，表示結果都塞完了，可以準備對齊動畫並停下來
           // Reel 從上到下應該現在是這樣： 3 4 5 | 6 0 1 | 2, 對照初始狀態：0 1 2 | 3 4 5 | 6
           // 0 被丟到最上面時候，表示剛好要停下來，但為了避免有拉回的狀況，所有在 1 被丟上去的時候就要開始跑對齊動畫
           else {
@@ -124,7 +127,7 @@ export class Reel extends Component {
   startSpin() {
     // 設定本次目標結果
     this.targetResult = getRandomResult();
-    this._updatedResultCount = 0;
+    this._tempUpdatedSet.clear();
     // this._isSpinning = true;
     tween(this.node)
       .to(this.tweenSpinDuration, { position: this._tweenPosition }) // 往上跳
@@ -157,7 +160,8 @@ export class Reel extends Component {
   startAlign() {
     this._isStopping = false;
     this._isSpinning = false;
-    this._updatedResultCount = 0;
+    this._tempUpdatedSet.clear();
+
     // index = 0 的 Slot 不要使用 tween
     for (let i = this.slotCount - 1; i > 0; i--) {
       const slot = this.slots[i];
