@@ -6,10 +6,15 @@ import {
   Node,
   Vec3,
   tween,
-  CCFloat
+  CCFloat,
+  CCBoolean
 } from 'cc';
 import { SlotPool } from './SlotPool';
-import { getRandomResult, getRandomSlotType } from './utils/uitls';
+import {
+  getRandomResult,
+  getRandomSlotType,
+  getRandomSlotTypes
+} from './utils/uitls';
 import { Slot } from './Slot';
 import { SlotType } from './types/index.d';
 import { EventManager } from './EventManager';
@@ -23,11 +28,24 @@ export class Reel extends Component {
   public tweenSpinDuration: number = 0.15;
   @property(CCFloat)
   public tweenAlignDuration: number = 0.3;
+  @property(CCFloat)
+  public spinDuration: number = 1.4;
+  @property(CCFloat)
+  public randomCount: number = 7;
+  @property(CCBoolean)
+  public isDebug: boolean = false;
 
   public slots: Node[] = [];
   public slotInstances: Slot[] = [];
   public startPositions: Vec3[] = [];
-  public targetResult: SlotType[] = [];
+  // 每次輪轉的結果
+  public targetResult: [SlotType, SlotType, SlotType] = [
+    SlotType.Cherry,
+    SlotType.Cherry,
+    SlotType.Cherry
+  ];
+  // 每次輪轉的隨機樣式
+  public firstRandom: SlotType[] = [];
   // 一條Reel上總共有多少格符號 (可見3格 + 上下緩衝格)
   public slotCount: number = 7;
   // 初始中心格的索引
@@ -42,7 +60,8 @@ export class Reel extends Component {
   private _isStopping: boolean = false;
   private _startPosition: Vec3 = new Vec3(0, 0, 0);
   private _tweenPosition: Vec3 = new Vec3(0, 0, 0);
-  private _tempUpdatedSet: Set<SlotType> = new Set();
+  private _tempTargetSet: Set<SlotType> = new Set();
+  private _tempFirstRandomSet: Set<SlotType> = new Set();
 
   protected start(): void {
     // -3 是因為中心格下方有兩格且因為是索引要再減一
@@ -76,19 +95,19 @@ export class Reel extends Component {
         if (this._isStopping) {
           // 填入結果：將結果回填給索引為 3, 4(this._positionCenterIndex), 5 的 Slot 上
           // 因為這個邏輯為固定的，所以可用較為制式的寫法
-          if (this._tempUpdatedSet.size < 3) {
+          if (this._tempTargetSet.size < this.targetResult.length) {
             // index 3, 4, 5 才處理
             // 使用 set 來辨識是否已經更新過了，較為高效
             if (
               Math.abs(i - this._positionCenterIndex) <= 1 &&
-              !this._tempUpdatedSet.has(i)
+              !this._tempTargetSet.has(i)
             ) {
               const targetType =
                 this.targetResult[i - this._positionCenterIndex + 1];
               if (targetType !== undefined) {
                 this.slotInstances[i].slotType = targetType;
                 console.log(this.node.name, i, targetType);
-                this._tempUpdatedSet.add(i);
+                this._tempTargetSet.add(i);
               }
             }
           }
@@ -98,6 +117,22 @@ export class Reel extends Component {
           else {
             // 此時狀態：1 2 3 | 4 5 6 | 0
             if (i === 1) this.startAlign();
+          }
+        } else {
+          // 填入隨機樣式(每次輪轉只會個別 slot 只會更新一次，而且是第一次被丟上去就會更新)
+          if (this._tempFirstRandomSet.size < this.firstRandom.length) {
+            // index < this.firstRandom.length- 1 才處理
+            // 使用 set 來辨識是否已經更新過了，較為高效
+            if (
+              i <= this.firstRandom.length - 1 &&
+              !this._tempFirstRandomSet.has(i)
+            ) {
+              const randomType = this.firstRandom[i];
+              if (randomType !== undefined) {
+                this.slotInstances[i].slotType = randomType;
+                this._tempFirstRandomSet.add(i);
+              }
+            }
           }
         }
       }
@@ -115,7 +150,10 @@ export class Reel extends Component {
         0
       );
       slotInstance.slotType = getRandomSlotType();
-      slotInstance.testLabel.string = `${i}`;
+      if (this.isDebug) {
+        slotInstance.testLabel.string = `${i}`;
+        slotInstance.testLabel.node.active = true;
+      }
       slot.setPosition(startPosition);
       slot.setParent(this.node);
       this.slots.push(slot);
@@ -127,7 +165,10 @@ export class Reel extends Component {
   startSpin() {
     // 設定本次目標結果
     this.targetResult = getRandomResult();
-    this._tempUpdatedSet.clear();
+    // 設定本次隨機樣式(可以自由調整數量)
+    this.firstRandom = getRandomSlotTypes(this.randomCount);
+    this._tempTargetSet.clear();
+    this._tempFirstRandomSet.clear();
     // this._isSpinning = true;
     tween(this.node)
       .to(this.tweenSpinDuration, { position: this._tweenPosition }) // 往上跳
@@ -136,7 +177,7 @@ export class Reel extends Component {
         // 完成之後，計時準備停下的狀態
         this.scheduleOnce(() => {
           this._isStopping = true;
-        }, 1.5);
+        }, this.spinDuration);
       })
       .start();
     // 在前面的動畫結束前一點點就開始轉動動畫，才不會有卡頓感
@@ -145,22 +186,11 @@ export class Reel extends Component {
     }, this.tweenSpinDuration * 1.95);
   }
 
-  startAlignTest() {
-    this._isStopping = false;
-    this._isSpinning = false;
-    console.log('reel', this.node.name);
-    console.log(
-      "it's slots",
-      this.slotInstances.map((s) => s.slotType)
-    );
-  }
-
   // 當轉動結束後，開始對齊
   // 這邊的對齊是指，讓結果格子對齊到正確的格子上
   startAlign() {
     this._isStopping = false;
     this._isSpinning = false;
-    this._tempUpdatedSet.clear();
 
     // index = 0 的 Slot 不要使用 tween
     for (let i = this.slotCount - 1; i > 0; i--) {

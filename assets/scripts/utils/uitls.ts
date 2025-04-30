@@ -17,8 +17,8 @@ export function getRandomSlotTypeFruit(): SlotType {
 }
 
 // 測試用
-export function getRandomResult(): SlotType[] {
-  const result: SlotType[][] = [
+export function getRandomResult(): [SlotType, SlotType, SlotType] {
+  const result: [SlotType, SlotType, SlotType][] = [
     [SlotType.Banana, SlotType.Banana, SlotType.Banana],
     [SlotType.Grape, SlotType.Grape, SlotType.Grape],
     [SlotType.Wild, SlotType.Wild, SlotType.Wild],
@@ -28,4 +28,8 @@ export function getRandomResult(): SlotType[] {
   ];
   const target = Math.floor(Math.random() * result.length);
   return result[target];
+}
+
+export function getRandomSlotTypes(count: number = 3): SlotType[] {
+  return Array.from({ length: count }, () => getRandomSlotType());
 }

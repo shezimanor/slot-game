@@ -435,7 +435,7 @@
       "__id__": 1
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 19
@@ -529,7 +529,7 @@
     "_string": "",
     "_horizontalAlign": 0,
     "_verticalAlign": 0,
-    "_actualFontSize": 37.55555555555556,
+    "_actualFontSize": 34.55555555555556,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 20,

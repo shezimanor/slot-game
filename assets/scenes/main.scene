@@ -1561,6 +1561,9 @@
     "slotHeight": 135,
     "tweenSpinDuration": 0.15,
     "tweenAlignDuration": 0.3,
+    "spinDuration": 1.3,
+    "randomCount": 7,
+    "isDebug": false,
     "_id": "484jZ5hclKjaS7+58wNaf6"
   },
   {
@@ -1646,6 +1649,9 @@
     "slotHeight": 135,
     "tweenSpinDuration": 0.15,
     "tweenAlignDuration": 0.3,
+    "spinDuration": 1.3,
+    "randomCount": 7,
+    "isDebug": false,
     "_id": "1dJ1ovZrFLkbO1jR0V4Fjh"
   },
   {
@@ -1731,6 +1737,9 @@
     "slotHeight": 135,
     "tweenSpinDuration": 0.15,
     "tweenAlignDuration": 0.3,
+    "spinDuration": 1.3,
+    "randomCount": 7,
+    "isDebug": false,
     "_id": "42basz1jRIG4IHbKwJPwFP"
   },
   {
@@ -1816,6 +1825,9 @@
     "slotHeight": 135,
     "tweenSpinDuration": 0.15,
     "tweenAlignDuration": 0.3,
+    "spinDuration": 1.3,
+    "randomCount": 7,
+    "isDebug": false,
     "_id": "5doTTUJpFGZ58NnEYicVjp"
   },
   {
@@ -1901,6 +1913,9 @@
     "slotHeight": 135,
     "tweenSpinDuration": 0.15,
     "tweenAlignDuration": 0.3,
+    "spinDuration": 1.3,
+    "randomCount": 7,
+    "isDebug": false,
     "_id": "b9eT+0w3lEVYdSLuLsgDG9"
   },
   {
