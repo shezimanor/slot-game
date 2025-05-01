@@ -19,3 +19,18 @@ export enum SlotSpriteFrameType {
   Wild = 'item-wild', // 6
   Scatter = 'item-scatter' // 7
 }
+
+type PayoutTable = {
+  [key in SlotType]: {
+    3: number;
+    4: number;
+    5: number;
+  };
+};
+
+interface PayLineResult {
+  lineIndex: number; // 第幾條賠付線（0~9）
+  matched: SlotType; // 是哪個符號中獎（例：SlotType.Cherry）
+  count: number; // 連線個數（3,4,5）
+  win: number; // 該線贏得的金額
+}
