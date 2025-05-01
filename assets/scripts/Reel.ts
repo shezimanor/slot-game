@@ -29,7 +29,7 @@ export class Reel extends Component {
   @property(CCFloat)
   public tweenAlignDuration: number = 0.3;
   @property(CCFloat)
-  public spinDuration: number = 1.4;
+  public spinDuration: number = 1.5;
   @property(CCFloat)
   public randomCount: number = 7;
   @property(CCBoolean)
@@ -51,9 +51,9 @@ export class Reel extends Component {
   // 初始中心格的索引
   public _positionCenterIndex: number = 4;
   // 初始滾動速度(px/sec)
-  private _spinSpeed: number = 1350;
+  private _spinSpeed: number = 1417.5;
   // 減速後滾動速度(px/sec)
-  private _stopSpeed: number = 607.5;
+  private _stopSpeed: number = 742.5;
   // 輪轉的狀態標記(正常速度的動畫)
   private _isSpinning: boolean = false;
   // 準備要停止的狀態標記(減速中的動畫)
