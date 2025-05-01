@@ -3,6 +3,7 @@ import { SlotPool } from './SlotPool';
 import { EventManager } from './EventManager';
 import { ResourceManager } from './ResourceManager';
 import { Reel } from './Reel';
+import { SlotType } from './types/index.d';
 const { ccclass, property } = _decorator;
 
 @ccclass('ReelManager')
@@ -56,14 +57,14 @@ export class ReelManager extends Component {
     }
   }
 
-  startSpin() {
+  startSpin(resultMatrix: SlotType[][]) {
     if (this._isSpinning) return;
     this._isSpinning = true;
     this._stoppedReels = 0;
     for (let i = 0; i < this.reelInstances.length; i++) {
       // 用延遲的方式讓每個Reel啟動
       this.scheduleOnce(() => {
-        this.reelInstances[i].startSpin();
+        this.reelInstances[i].startSpin(resultMatrix[i]);
       }, i * this.reelStartDelay);
     }
   }

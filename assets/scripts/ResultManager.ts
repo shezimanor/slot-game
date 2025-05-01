@@ -3,29 +3,29 @@ import { PayLineResult, PayoutTable, SlotType } from './types/index.d';
 export class ResultManager {
   private constructor() {}
 
-  public rows: number = 5; // 每一橫列有幾個格子
-  public cols: number = 3; // 每一直列有幾個格子
+  public static rows: number = 5; // 每一橫列有幾個格子
+  public static cols: number = 3; // 每一直列有幾個格子
 
   // 機率權重表
-  public slotWeights: Record<SlotType, number> = {
-    [SlotType.Cherry]: 28,
+  public static slotWeights: Record<SlotType, number> = {
+    [SlotType.Cherry]: 26,
     [SlotType.Lemon]: 22,
     [SlotType.Orange]: 15,
     [SlotType.Banana]: 12,
     [SlotType.Grape]: 10,
     [SlotType.Watermelon]: 8,
-    [SlotType.Wild]: 3,
+    [SlotType.Wild]: 5,
     [SlotType.Scatter]: 2
   };
 
   // 總權重(因為依賴 slotWeights 的值，所以要寫在他的下面)
-  public totalWeight: number = Object.values(this.slotWeights).reduce(
+  public static totalWeight: number = Object.values(this.slotWeights).reduce(
     (acc, weight) => acc + weight,
     0
   );
 
   // 賠付表
-  public payoutTable: PayoutTable = {
+  public static payoutTable: PayoutTable = {
     [SlotType.Cherry]: { 3: 2, 4: 5, 5: 20 },
     [SlotType.Lemon]: { 3: 2, 4: 6, 5: 25 },
     [SlotType.Orange]: { 3: 3, 4: 8, 5: 30 },
@@ -35,10 +35,10 @@ export class ResultManager {
   };
 
   // Free Spin 的賠付表
-  public scatterPayout = { 3: 3, 4: 4, 5: 5 };
+  public static scatterPayout = { 3: 3, 4: 4, 5: 5 };
 
   // 賠付線 格子(上):0, 格子(中):1, 格子(下):2
-  public payLines: number[][] = [
+  public static payLines: number[][] = [
     [1, 1, 1, 1, 1],
     [0, 0, 0, 0, 0],
     [2, 2, 2, 2, 2],
@@ -60,7 +60,7 @@ export class ResultManager {
    * @returns {SlotType} 隨機選擇的水果類型。
    * @throws {Error} 如果未找到水果類型（在正常情況下不應發生）。
    */
-  getWeightedRandomSlotType(): SlotType {
+  static getWeightedRandomSlotType(): SlotType {
     const random = Math.random() * this.totalWeight;
     let cumulativeWeight = 0;
 
@@ -81,7 +81,7 @@ export class ResultManager {
    * @returns {SlotType[][]} 一個二維陣列，表示結果矩陣，
    * 其中每個內部陣列對應於一直列水果類型。
    */
-  generateResultMatrix() {
+  static generateResultMatrix() {
     const matrix: SlotType[][] = [];
     for (let r = 0; r < this.rows; r++) {
       const row: SlotType[] = [];
@@ -100,7 +100,10 @@ export class ResultManager {
    * @param payLine - 一個數字陣列，表示要從矩陣中提取的每列的行位置。
    * @returns 一個 `SlotType` 陣列，對應於指定的賠付線。
    */
-  getPayLineSlotType(matrix: SlotType[][], payLine: number[]): SlotType[] {
+  static getPayLineSlotType(
+    matrix: SlotType[][],
+    payLine: number[]
+  ): SlotType[] {
     return matrix.map((row, colIndex) => row[payLine[colIndex]]);
   }
 
@@ -119,7 +122,7 @@ export class ResultManager {
    * 3. 若連線數量大於等於 3，且該類型存在於支付表中，則返回對應的贏分。
    * 4. 若不符合中獎條件，則返回未中獎結果。
    */
-  calculateLineWin(slots: SlotType[]): {
+  static calculateLineWin(slots: SlotType[]): {
     count: number;
     win: number;
     matched: SlotType | null;
@@ -165,7 +168,7 @@ export class ResultManager {
    *
    * 此函式會檢查矩陣中出現的 Scatter 數量，若大於 3 則觸發 Free Spin。
    */
-  calculateScatter(matrix: SlotType[][]): {
+  static calculateScatter(matrix: SlotType[][]): {
     scatterCount: number;
     scatterTriggered: boolean;
   } {
@@ -190,7 +193,7 @@ export class ResultManager {
    * - `scatterCount`: Free Spin 次數。
    * - `scatterTriggered`: 是否觸發了 Free Spin。
    */
-  getRandomResult() {
+  static getRandomResult() {
     // 計算每條賠付線的結果
     let totalWin = 0;
     const payLineResult: PayLineResult[] = [];

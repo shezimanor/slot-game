@@ -39,7 +39,7 @@ export class Reel extends Component {
   public slotInstances: Slot[] = [];
   public startPositions: Vec3[] = [];
   // 每次輪轉的結果
-  public targetResult: [SlotType, SlotType, SlotType] = [
+  public targetResult: SlotType[] = [
     SlotType.Cherry,
     SlotType.Cherry,
     SlotType.Cherry
@@ -106,7 +106,7 @@ export class Reel extends Component {
                 this.targetResult[i - this._positionCenterIndex + 1];
               if (targetType !== undefined) {
                 this.slotInstances[i].slotType = targetType;
-                console.log(this.node.name, i, targetType);
+                // console.log(this.node.name, i, targetType);
                 this._tempTargetSet.add(i);
               }
             }
@@ -162,9 +162,9 @@ export class Reel extends Component {
     }
   }
 
-  startSpin() {
+  startSpin(targetResult: SlotType[]) {
     // 設定本次目標結果
-    this.targetResult = getRandomResult();
+    this.targetResult = targetResult;
     // 設定本次隨機樣式(可以自由調整數量)
     this.firstRandom = getRandomSlotTypes(this.randomCount);
     this._tempTargetSet.clear();
@@ -211,10 +211,10 @@ export class Reel extends Component {
   }
 
   stopSpin() {
-    console.log('reel', this.node.name);
+    // console.log('reel', this.node.name);
     console.log(
       "it's slots",
-      this.slotInstances.map((s) => s.slotType)
+      this.slotInstances.filter((_, i) => i > 2 && i < 6).map((s) => s.slotType)
     );
     // 觸發事件，表示這條 Reel 已經從 spin 停止了
     EventManager.eventTarget.emit('reel-stopped');
