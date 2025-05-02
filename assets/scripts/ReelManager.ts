@@ -1,4 +1,4 @@
-import { _decorator, AudioClip, CCFloat, Component, Node, Prefab } from 'cc';
+import { _decorator, AudioClip, Component, Prefab } from 'cc';
 import { SlotPool } from './SlotPool';
 import { EventManager } from './EventManager';
 import { ResourceManager } from './ResourceManager';
@@ -20,7 +20,7 @@ export class ReelManager extends Component {
   // 每條reel間的遞延時間（秒）
   public reelStartDelay: number = 0.35;
   // 整個 ReelManager 的輪轉狀態標記
-  private _isSpinning: boolean = false;
+  public isSpinning: boolean = false;
   // 用來紀錄已經停止的Reel數量
   private _stoppedReels: number = 0;
 
@@ -57,8 +57,8 @@ export class ReelManager extends Component {
   }
 
   startSpin(resultMatrix: SlotType[][]) {
-    if (this._isSpinning) return;
-    this._isSpinning = true;
+    if (this.isSpinning) return;
+    this.isSpinning = true;
     this._stoppedReels = 0;
     // 播放 spin 音效
     AudioManager.instance.stopMusic();
@@ -87,7 +87,7 @@ export class ReelManager extends Component {
   }
 
   stopSpin() {
-    this._isSpinning = false;
+    this.isSpinning = false;
     // 停止音效
     AudioManager.instance.stopMusic();
     // 觸發事件，表示所有的 Reel 都已經停止了，可以重新啟動面板上的按鈕

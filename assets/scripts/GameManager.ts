@@ -9,6 +9,7 @@ import {
 } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { EventManager } from './EventManager';
+import { ReelManager } from './ReelManager';
 import { ResultManager } from './ResultManager';
 import { AudioManager } from './AudioManager';
 const { ccclass, property } = _decorator;
@@ -40,6 +41,8 @@ export class GameManager extends Component {
   public totalCost: number = 0;
   // 累積獎金
   public totalReward: number = 0;
+  // 自動 Spin 標記
+  public isAutoSpin: boolean = false;
 
   protected onLoad(): void {
     ResourceManager.init();
@@ -75,6 +78,7 @@ export class GameManager extends Component {
   }
 
   onClickSpin() {
+    if (ReelManager.instance.isSpinning) return;
     // 禁用按鈕
     this.inactivateButtons();
     // 隱藏獎金標籤
@@ -104,18 +108,23 @@ export class GameManager extends Component {
     this.updateBetLabel();
   }
 
+  onClickAutoSpin() {
+    this.isAutoSpin = !this.isAutoSpin;
+    if (this.isAutoSpin) this.onClickSpin();
+    else this.activateButtons();
+  }
+
   inactivateButtons() {
     this.spinButton.interactable = false;
     this.maxBetButton.interactable = false;
-    this.autoSpinButton.interactable = false;
     this.minusBetButton.interactable = false;
     this.plusBetButton.interactable = false;
   }
 
   activateButtons() {
+    if (ReelManager.instance.isSpinning || this.isAutoSpin) return;
     this.spinButton.interactable = true;
     this.maxBetButton.interactable = true;
-    this.autoSpinButton.interactable = true;
     this.minusBetButton.interactable = true;
     this.plusBetButton.interactable = true;
   }
@@ -127,23 +136,28 @@ export class GameManager extends Component {
   }
 
   showTotalWin() {
-    this.scheduleOnce(() => {
-      if (this.totalWin > 0) {
-        // 播放中獎音效
-        AudioManager.instance.playMusic(
-          ResourceManager.getAsset<AudioClip>('audios', 'win'),
-          false
-        );
-      } else {
-        // 播放沒中音效
-        AudioManager.instance.playMusic(
-          ResourceManager.getAsset<AudioClip>('audios', 'no-win'),
-          false
-        );
-      }
-    }, 0.1);
+    if (this.totalWin > 0) {
+      // 播放中獎音效
+      AudioManager.instance.playMusic(
+        ResourceManager.getAsset<AudioClip>('audios', 'win'),
+        false
+      );
+    } else {
+      // 播放沒中音效
+      AudioManager.instance.playMusic(
+        ResourceManager.getAsset<AudioClip>('audios', 'no-win'),
+        false
+      );
+    }
     this.totalWinLabel.string = `Total Win: ${this.totalWin}`;
     this.totalWinLabel.node.active = true;
     this.totalWinLabelAnimation.play();
+    // 確認是否為自動 Spin
+    if (this.isAutoSpin) {
+      // 如果是自動 Spin，則在 1 秒後自動 Spin
+      this.scheduleOnce(() => {
+        if (this.isAutoSpin) this.onClickSpin();
+      }, 1);
+    }
   }
 }
