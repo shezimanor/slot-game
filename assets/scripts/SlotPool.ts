@@ -19,7 +19,6 @@ export class SlotPool {
 
   // 初始化
   init(prefab: Prefab) {
-    console.log('object pool init prefab');
     this._prefab = prefab;
   }
 

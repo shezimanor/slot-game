@@ -79,7 +79,8 @@ export class ReelManager extends Component {
 
   stopSpin() {
     this._isSpinning = false;
-    // 觸發事件，表示所有的 Reel 都已經停止了，可以重新啟動 Spin 按鈕
-    EventManager.eventTarget.emit('activate-spin');
+    // 觸發事件，表示所有的 Reel 都已經停止了，可以重新啟動面板上的按鈕
+    EventManager.eventTarget.emit('activate-buttons');
+    EventManager.eventTarget.emit('show-total-win');
   }
 }
