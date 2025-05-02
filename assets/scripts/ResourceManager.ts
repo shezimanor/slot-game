@@ -1,7 +1,7 @@
-import { Asset, Prefab, resources, SpriteAtlas } from 'cc';
+import { Asset, AudioClip, Prefab, resources, SpriteAtlas } from 'cc';
 import { EventManager } from './EventManager';
 
-type AssetType = Prefab | SpriteAtlas;
+type AssetType = Prefab | SpriteAtlas | AudioClip;
 
 export class ResourceManager {
   private constructor() {}
@@ -9,8 +9,10 @@ export class ResourceManager {
     path: string;
     type: typeof Asset;
   }> = [
+    // 新增資源的資料夾時，請同時在這裡新增
     { path: 'prefabs', type: Prefab },
-    { path: 'textures/items', type: SpriteAtlas }
+    { path: 'textures/items', type: SpriteAtlas },
+    { path: 'audios', type: AudioClip }
   ];
   public static assetStores: Record<string, Record<string, AssetType>> = {};
   public static completeCount: number = 0;
@@ -43,10 +45,10 @@ export class ResourceManager {
       }
       assets.forEach((asset) => {
         const name = asset.name;
-        console.log('name', name);
+        // console.log('name', name);
         this.assetStores[path][name] = asset;
       });
-      console.log(`${path} 載入成功`);
+      // console.log(`${path} 載入成功`);
       callback(true);
     });
   }

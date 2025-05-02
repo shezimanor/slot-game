@@ -1,7 +1,16 @@
-import { _decorator, Animation, Button, Component, Label, Node } from 'cc';
+import {
+  _decorator,
+  Animation,
+  AudioClip,
+  Button,
+  Component,
+  Label,
+  Node
+} from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { EventManager } from './EventManager';
 import { ResultManager } from './ResultManager';
+import { AudioManager } from './AudioManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameManager')
@@ -118,6 +127,21 @@ export class GameManager extends Component {
   }
 
   showTotalWin() {
+    this.scheduleOnce(() => {
+      if (this.totalWin > 0) {
+        // 播放中獎音效
+        AudioManager.instance.playMusic(
+          ResourceManager.getAsset<AudioClip>('audios', 'win'),
+          false
+        );
+      } else {
+        // 播放沒中音效
+        AudioManager.instance.playMusic(
+          ResourceManager.getAsset<AudioClip>('audios', 'no-win'),
+          false
+        );
+      }
+    }, 0.1);
     this.totalWinLabel.string = `Total Win: ${this.totalWin}`;
     this.totalWinLabel.node.active = true;
     this.totalWinLabelAnimation.play();
