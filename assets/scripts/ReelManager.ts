@@ -80,6 +80,7 @@ export class ReelManager extends Component {
       ResourceManager.getAsset<AudioClip>('audios', 'reel-stop')
     );
     this._stoppedReels++;
+    // 所有的 Reel 都停止了
     if (this._stoppedReels >= this.reelInstances.length) {
       this._stoppedReels = 0;
       this.stopSpin();
@@ -88,10 +89,12 @@ export class ReelManager extends Component {
 
   stopSpin() {
     this.isSpinning = false;
-    // 停止音效
+    // 停止轉動音效
     AudioManager.instance.stopMusic();
-    // 觸發事件，表示所有的 Reel 都已經停止了，可以重新啟動面板上的按鈕
+    // 觸發事件，表示所有的 Reel 都已經停止了
+    // 重新啟動面板上的按鈕
     EventManager.eventTarget.emit('activate-buttons');
+    // 顯示獎金
     EventManager.eventTarget.emit('show-total-win');
   }
 }
