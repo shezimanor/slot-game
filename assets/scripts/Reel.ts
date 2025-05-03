@@ -16,7 +16,7 @@ import {
   getRandomSlotTypes
 } from './utils/uitls';
 import { Slot } from './Slot';
-import { SlotType } from './types/index.d';
+import { PayLineResult, SlotType } from './types/index.d';
 import { EventManager } from './EventManager';
 const { ccclass, property } = _decorator;
 
@@ -35,6 +35,11 @@ export class Reel extends Component {
   @property(CCBoolean)
   public isDebug: boolean = false;
 
+  // 這邊的設計， slot 3, 4, 5 是常駐顯示結果的三個格子，而且不會變
+  // 所以會有 resultSlotInstances 來儲存這三格的 Slot 實例，讓後續額外的處理可以更快
+  // 只存放結果的三個格子
+  public resultSlotInstances: Slot[] = [];
+  // 存放所有的格子
   public slots: Node[] = [];
   public slotInstances: Slot[] = [];
   public startPositions: Vec3[] = [];
@@ -44,6 +49,8 @@ export class Reel extends Component {
     SlotType.Cherry,
     SlotType.Cherry
   ];
+  // 紀錄前一輪有被顯示霓虹外框的 Slot
+  private _lastActiveSlotInstances: Slot[] = [];
   // 每次輪轉的隨機樣式
   public firstRandom: SlotType[] = [];
   // 一條Reel上總共有多少格符號 (可見3格 + 上下緩衝格)
@@ -58,10 +65,26 @@ export class Reel extends Component {
   private _isSpinning: boolean = false;
   // 準備要停止的狀態標記(減速中的動畫)
   private _isStopping: boolean = false;
+  // Reel 的索引值
+  private _index: number = 0;
   private _startPosition: Vec3 = new Vec3(0, 0, 0);
   private _tweenPosition: Vec3 = new Vec3(0, 0, 0);
+  // 兩個 set 用來記錄每次 Spin 已經更新過的格子，避免重複更新
   private _tempTargetSet: Set<SlotType> = new Set();
   private _tempFirstRandomSet: Set<SlotType> = new Set();
+
+  protected onLoad(): void {
+    EventManager.eventTarget.on(
+      'show-active-slots',
+      this.showActiveSlots,
+      this
+    );
+    EventManager.eventTarget.on(
+      'clear-active-slots',
+      this.hideLastActiveSlots,
+      this
+    );
+  }
 
   protected start(): void {
     // -3 是因為中心格下方有兩格且因為是索引要再減一
@@ -74,7 +97,7 @@ export class Reel extends Component {
     );
   }
 
-  update(deltaTime: number) {
+  protected update(deltaTime: number): void {
     if (!this._isSpinning) return;
     const speed = this._isStopping ? this._stopSpeed : this._spinSpeed;
 
@@ -111,7 +134,7 @@ export class Reel extends Component {
               }
             }
           }
-          // set已經有 3 個項目，表示結果都塞完了，可以準備對齊動畫並停下來
+          // set 已經有 3 個項目，表示"結果"都塞完了，可以準備對齊動畫並停下來
           // Reel 從上到下應該現在是這樣： 3 4 5 | 6 0 1 | 2, 對照初始狀態：0 1 2 | 3 4 5 | 6
           // 0 被丟到最上面時候，表示剛好要停下來，但為了避免有拉回的狀況，所有在 1 被丟上去的時候就要開始跑對齊動畫
           else {
@@ -119,9 +142,9 @@ export class Reel extends Component {
             if (i === 1) this.startAlign();
           }
         } else {
-          // 填入隨機樣式(每次輪轉只會個別 slot 只會更新一次，而且是第一次被丟上去就會更新)
+          // 填入隨機樣式(每次輪轉個別 slot 只會更新一次，而且是第一次被丟上去就會更新)
           if (this._tempFirstRandomSet.size < this.firstRandom.length) {
-            // index < this.firstRandom.length- 1 才處理
+            // index < this.firstRandom.length - 1 才處理
             // 使用 set 來辨識是否已經更新過了，較為高效
             if (
               i <= this.firstRandom.length - 1 &&
@@ -139,8 +162,23 @@ export class Reel extends Component {
     }
   }
 
-  init() {
-    //Reel 初始狀態從上到下應該現在是這樣： 0 1 2 | 3 4 5 | 6
+  protected onDestroy(): void {
+    EventManager.eventTarget.off(
+      'show-active-slots',
+      this.showActiveSlots,
+      this
+    );
+    EventManager.eventTarget.off(
+      'clear-active-slots',
+      this.hideLastActiveSlots,
+      this
+    );
+  }
+
+  init(index: number) {
+    // 設定索引值
+    this._index = index;
+    // Reel 初始狀態從上到下應該現在是這樣： 0 1 2 | 3 4 5 | 6
     for (let i = 0; i < this.slotCount; i++) {
       const slot = SlotPool.instance.getSlot();
       const slotInstance = slot.getComponent(Slot);
@@ -159,6 +197,10 @@ export class Reel extends Component {
       this.slots.push(slot);
       this.slotInstances.push(slotInstance);
       this.startPositions.push(startPosition);
+      // 將結果的三個格子存起來
+      if (i >= 3 && i <= 5) {
+        this.resultSlotInstances.push(slotInstance);
+      }
     }
   }
 
@@ -167,9 +209,10 @@ export class Reel extends Component {
     this.targetResult = targetResult;
     // 設定本次隨機樣式(可以自由調整數量)
     this.firstRandom = getRandomSlotTypes(this.randomCount);
+    // 清空紀錄用的 set
     this._tempTargetSet.clear();
     this._tempFirstRandomSet.clear();
-    // this._isSpinning = true;
+    // 開始最一開始的上抬動畫
     tween(this.node)
       .to(this.tweenSpinDuration, { position: this._tweenPosition }) // 往上跳
       .to(this.tweenSpinDuration, { position: this._startPosition }) // 回到原點
@@ -180,7 +223,7 @@ export class Reel extends Component {
         }, this.spinDuration);
       })
       .start();
-    // 在前面的動畫結束前一點點就開始轉動動畫，才不會有卡頓感
+    // 在前面的（上抬動畫）動畫結束前一點點就開始轉動動畫，才不會有卡頓感
     this.scheduleOnce(() => {
       this._isSpinning = true;
     }, this.tweenSpinDuration * 1.95);
@@ -211,12 +254,40 @@ export class Reel extends Component {
   }
 
   stopSpin() {
-    // console.log('reel', this.node.name);
-    console.log(
-      "it's slots",
-      this.slotInstances.filter((_, i) => i > 2 && i < 6).map((s) => s.slotType)
-    );
     // 觸發事件，表示這條 Reel 已經從 spin 停止了
     EventManager.eventTarget.emit('reel-stopped');
+  }
+
+  hideLastActiveSlots() {
+    // 隱藏上次顯示的霓虹外框
+    for (const slot of this._lastActiveSlotInstances) {
+      slot.hideFrame();
+    }
+    this._lastActiveSlotInstances = [];
+  }
+
+  showActiveSlots(payLineResults: PayLineResult[]) {
+    // 顯示這次中獎的霓虹外框
+    for (const result of payLineResults) {
+      const { payLine, count } = result;
+      // 當 this._index < 3 時，在有 payLine 的情況下，該 Reel 的 Slot 一定會有外框線要顯示
+      // 當 this._index >= 3 時，則要判斷該 payLineResult 的 count 是否為 4 or 5
+
+      // 取得該 payLine 在當前直列(Reel)下需要顯示外框線的 Slot 的索引
+      const slotIndex = payLine[this._index];
+      // 取得該 Slot 的實例
+      const slotInstance = this.resultSlotInstances[slotIndex];
+      // 開始判斷條件，符合條件才能顯示外框線(index: 0,1,2,3,4)
+      if (
+        this._index < 3 ||
+        (this._index === 3 && count >= 4) ||
+        (this._index === 4 && count === 5)
+      ) {
+        // 顯示外框線
+        slotInstance.showFrame();
+        // 將顯示過的 Slot 實例存起來
+        this._lastActiveSlotInstances.push(slotInstance);
+      }
+    }
   }
 }

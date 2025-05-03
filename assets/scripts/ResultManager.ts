@@ -43,7 +43,7 @@ export class ResultManager {
   public static scatterPayout = { 3: 3, 4: 4, 5: 5 };
 
   // 賠付線 格子(上):0, 格子(中):1, 格子(下):2
-  public static payLines: number[][] = [
+  public static payLines: [number, number, number, number, number][] = [
     [1, 1, 1, 1, 1],
     [0, 0, 0, 0, 0],
     [2, 2, 2, 2, 2],
@@ -214,7 +214,7 @@ export class ResultManager {
       // 如果有中獎，則加入結果
       if (count > 0) {
         payLineResult.push({
-          lineIndex: i,
+          payLine: line,
           matched,
           count,
           win

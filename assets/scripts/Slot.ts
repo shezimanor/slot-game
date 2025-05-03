@@ -1,4 +1,12 @@
-import { _decorator, Component, Label, Node, Sprite, SpriteAtlas } from 'cc';
+import {
+  _decorator,
+  Animation,
+  Component,
+  Label,
+  Node,
+  Sprite,
+  SpriteAtlas
+} from 'cc';
 import { SlotSpriteFrameType, SlotType } from './types/index.d';
 import { ResourceManager } from './ResourceManager';
 const { ccclass, property } = _decorator;
@@ -9,6 +17,8 @@ export class Slot extends Component {
   public slotBody: Sprite = null;
   @property(Node)
   public slotNeonFrame: Node = null;
+  @property(Animation)
+  public slotFrameAnimation: Animation = null;
   @property(Label)
   public testLabel: Label = null;
 
@@ -80,5 +90,15 @@ export class Slot extends Component {
         );
         break;
     }
+  }
+
+  showFrame() {
+    this.slotNeonFrame.active = true;
+    this.slotFrameAnimation.play();
+  }
+
+  hideFrame() {
+    this.slotNeonFrame.active = false;
+    this.slotFrameAnimation.stop();
   }
 }

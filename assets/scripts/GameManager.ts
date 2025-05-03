@@ -83,6 +83,8 @@ export class GameManager extends Component {
     this.inactivateButtons();
     // 隱藏獎金標籤
     this.hideTotalWin();
+    // 清空前次的結果(水果醒目效果)
+    EventManager.eventTarget.emit('clear-active-slots');
     // 先取得結果
     const spinResult = ResultManager.getRandomResult();
     EventManager.eventTarget.emit('start-spin', spinResult);

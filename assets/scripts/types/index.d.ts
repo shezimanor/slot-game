@@ -29,7 +29,7 @@ export type PayoutTable = {
 };
 
 export interface PayLineResult {
-  lineIndex: number; // 第幾條賠付線（0~9）
+  payLine: [number, number, number, number, number]; // 賠付線
   matched: SlotType; // 是哪個符號中獎（例：SlotType.Cherry）
   count: number; // 連線個數（3,4,5）
   win: number; // 該線贏得的金額

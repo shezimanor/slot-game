@@ -23,6 +23,8 @@ export class ReelManager extends Component {
   public isSpinning: boolean = false;
   // 用來紀錄已經停止的Reel數量
   private _stoppedReels: number = 0;
+  // 用來記錄當前的 SpinResult
+  private _spinResult: SpinResult = null;
 
   protected onLoad(): void {
     if (!ReelManager._instance) {
@@ -60,6 +62,7 @@ export class ReelManager extends Component {
     if (this.isSpinning) return;
     this.isSpinning = true;
     this._stoppedReels = 0;
+    this._spinResult = spinResult;
     // 播放 spin 音效
     AudioManager.instance.stopMusic();
     AudioManager.instance.playMusic(
@@ -97,5 +100,10 @@ export class ReelManager extends Component {
     EventManager.eventTarget.emit('activate-buttons');
     // 顯示獎金
     EventManager.eventTarget.emit('show-total-win');
+    // 顯示中獎圖案的霓虹外框
+    EventManager.eventTarget.emit(
+      'show-active-slots',
+      this._spinResult.payLineResult
+    );
   }
 }

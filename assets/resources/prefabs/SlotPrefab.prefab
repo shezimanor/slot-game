@@ -663,6 +663,9 @@
     "slotNeonFrame": {
       "__id__": 10
     },
+    "slotFrameAnimation": {
+      "__id__": 17
+    },
     "testLabel": {
       "__id__": 23
     },
