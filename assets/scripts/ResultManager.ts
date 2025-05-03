@@ -1,4 +1,9 @@
-import { PayLineResult, PayoutTable, SlotType } from './types/index.d';
+import {
+  PayLineResult,
+  PayoutTable,
+  SlotType,
+  SpinResult
+} from './types/index.d';
 
 export class ResultManager {
   private constructor() {}
@@ -193,7 +198,7 @@ export class ResultManager {
    * - `scatterCount`: Free Spin 次數。
    * - `scatterTriggered`: 是否觸發了 Free Spin。
    */
-  static getRandomResult() {
+  static getRandomResult(): SpinResult {
     // 計算每條賠付線的結果
     let totalWin = 0;
     const payLineResult: PayLineResult[] = [];

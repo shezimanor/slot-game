@@ -85,7 +85,7 @@ export class GameManager extends Component {
     this.hideTotalWin();
     // 先取得結果
     const spinResult = ResultManager.getRandomResult();
-    EventManager.eventTarget.emit('start-spin', spinResult.matrix);
+    EventManager.eventTarget.emit('start-spin', spinResult);
     console.log('抽獎', spinResult);
     // 將本次結果的 totalWin 寫入(因為這個 demo 設計的 spinResult.totalWin 是倍數，所以要乘上下注金額)
     this.totalWin = spinResult.totalWin * this.bet;

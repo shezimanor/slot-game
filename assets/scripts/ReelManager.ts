@@ -3,7 +3,7 @@ import { SlotPool } from './SlotPool';
 import { EventManager } from './EventManager';
 import { ResourceManager } from './ResourceManager';
 import { Reel } from './Reel';
-import { SlotType } from './types/index.d';
+import { SpinResult } from './types/index.d';
 import { AudioManager } from './AudioManager';
 const { ccclass, property } = _decorator;
 
@@ -51,12 +51,12 @@ export class ReelManager extends Component {
       ResourceManager.getAsset<Prefab>('prefabs', 'SlotPrefab')
     );
     // 初始化每個 Reel
-    for (const reelInstance of this.reelInstances) {
-      if (reelInstance) reelInstance.init();
+    for (let i = 0; i < this.reelInstances.length; i++) {
+      this.reelInstances[i].init(i);
     }
   }
 
-  startSpin(resultMatrix: SlotType[][]) {
+  startSpin(spinResult: SpinResult) {
     if (this.isSpinning) return;
     this.isSpinning = true;
     this._stoppedReels = 0;
@@ -69,7 +69,8 @@ export class ReelManager extends Component {
     for (let i = 0; i < this.reelInstances.length; i++) {
       // 用延遲的方式讓每個Reel啟動
       this.scheduleOnce(() => {
-        this.reelInstances[i].startSpin(resultMatrix[i]);
+        // 將矩陣內的陣列傳給每個 Reel，使其渲染正確的結果
+        this.reelInstances[i].startSpin(spinResult.matrix[i]);
       }, i * this.reelStartDelay);
     }
   }
