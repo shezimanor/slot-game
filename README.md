@@ -1,5 +1,7 @@
 # 老虎機 DEMO
 
+[Demo 連結](https://shezimanor.github.io/slot-game/)
+
 ## 遊戲說明
 
 本遊戲專案使用 `Cocos Creator 3.8.5` 建置。
